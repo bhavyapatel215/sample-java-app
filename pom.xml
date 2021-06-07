@@ -21,6 +21,9 @@
         <scala.version>2.12.6</scala.version>
         <node.version>v10.14.1</node.version>
         <npm.version>6.4.1</npm.version>
+        <sonar.projectKey>bhavyapatel215_java11-demo</sonar.projectKey>
+  		<sonar.organization>bhavyapatel215</sonar.organization>
+ 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
         <project.testresult.directory>${project.build.directory}/test-results</project.testresult.directory>

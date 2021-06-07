@@ -1,46 +1,68 @@
 pipeline {
-    agent{
-        label 'node1'
+    agent {label 'master'}
+    environment {
+        SONAR_TOKEN= '64329bab7f2264e78495529bfc2382f13ef589de'
+        APP_HOME='/home/app'
+        PRAGRA_BATCH='devs'
     }
-      triggers {
-            cron('* * * * *')
+    options { 
+        quietPeriod(30) 
     }
-    stages {
-       
-        //Stage to do checkout from scm
-        stage('Checkout'){
-            steps{
-                    git( branch : 'master', url: 'https://github.com/atinsingh/sample-java-app.git')    
-                    sh 'echo hello world'
-                }
-                
-        }
-        
-        //Stage to run maven clean
+    parameters { 
+            choice(name: 'ENV_TO_DEPLOY', 
+            choices: ['ST', 'UAT', 'STAGING'], description: 'Select a Env to deploy') 
 
-        stage('Clean') {
-            steps {
-                    sh 'chmod +x mvnw'
-                    sh './mvnw clean'
-                }
-            
-           
-            post {
-                failure {
-                    mail bcc: '', body: 'Some thing gone wrong in cleaning', cc: '', from: '', replyTo: '', subject: 'Check build', to: 'atin@pragra.co'
-                }
+             booleanParam(name: 'RUN', defaultValue: true, description: 'SELECT TO RUN')
+    }
+    // triggers {
+    //     pollSCM('* * * * *')
+    // }
+    tools{
+        maven  'm3'
+        jdk 'jdk11'
+    }
+
+    stages {
+        stage('Clean Ws') {
+            steps{
+                cleanWs()
             }
         }
-
+        stage('Git CheckoutOut'){
+            steps{
+                checkout scm
+            }
+        }
         stage('Compile') {
             steps {
-              
-                 sh './mvnw compile'
-                
+                sh 'mvn compile'
             }
-           
         }
-        
+       stage('Static Code Analaysis') {
+            steps {
+                withSonarQubeEnv(credentialsId: 'sonarcloud', installationName: 'sonarcloud') {
+                    sh 'mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar'
+                }
+            }
+        }
+         stage('Unit Test') {
+            steps {
+                sh 'mvn test'
+            }
+        }
+
+         stage('Package') {
+            steps {
+                sh 'mvn package'
+            }
+        }
     }
-  
+
+    post {
+        always {
+            echo 'ALL GOOD '
+        }
+    }
+
+
 }
