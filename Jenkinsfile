@@ -38,13 +38,13 @@ pipeline {
                 sh 'mvn compile'
             }
         }
-       stage('Static Code Analaysis') {
-            steps {
-                withSonarQubeEnv(credentialsId: 'SonarCloud', installationName: 'sonarcloud') {
-                    sh 'mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar'
-                }
-            }
-        }
+    //    stage('Static Code Analaysis') {
+    //         steps {
+    //             withSonarQubeEnv(credentialsId: 'SonarCloud', installationName: 'sonarcloud') {
+    //                 sh 'mvn verify org.sonarsource.scanner.maven:sonar-maven-plugin:sonar'
+    //             }
+    //         }
+    //     }
          stage('Unit Test') {
             steps {
                 sh 'mvn test'
